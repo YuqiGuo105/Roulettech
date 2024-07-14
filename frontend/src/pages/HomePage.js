@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 function parseJwt(token) {
@@ -15,30 +16,21 @@ function parseJwt(token) {
 
 const HomePage = () => {
   const navigate = useNavigate();
+  const [userName, setUserName] = useState('');
 
-  const idTokenEncoded = sessionStorage.getItem('idToken');
-  const accessTokenEncoded = sessionStorage.getItem('accessToken');
-  const refreshToken = sessionStorage.getItem('refreshToken');
-
-  const idToken = parseJwt(idTokenEncoded);
-  const accessToken = parseJwt(accessTokenEncoded);
-
-  if (idTokenEncoded) {
-    console.log("Amazon Cognito ID token encoded: " + idTokenEncoded);
-    console.log("Amazon Cognito ID token decoded: ", idToken);
-  } else {
-    console.log("No ID token found in sessionStorage.");
-  }
-
-  if (accessTokenEncoded) {
-    console.log("Amazon Cognito access token encoded: " + accessTokenEncoded);
-    console.log("Amazon Cognito access token decoded: ", accessToken);
-  } else {
-    console.log("No access token found in sessionStorage.");
-  }
-
-  console.log("Amazon Cognito refresh token: ", refreshToken);
-  console.log("Amazon Cognito example application. Not for use in production applications.");
+  useEffect(() => {
+    const idTokenEncoded = sessionStorage.getItem('idToken');
+    if (idTokenEncoded) {
+      const idToken = parseJwt(idTokenEncoded);
+      if (idToken && idToken.email) {
+        setUserName(idToken.email);
+      } else {
+        console.log("User name not found in ID token.");
+      }
+    } else {
+      console.log("No ID token found in sessionStorage.");
+    }
+  }, []);
 
   const handleLogout = () => {
     sessionStorage.clear();
@@ -47,7 +39,7 @@ const HomePage = () => {
 
   return (
     <div>
-      <h1>Hello World</h1>
+      <h1>Hello {userName}</h1>
       <p>See console log for Amazon Cognito user tokens.</p>
       <button onClick={handleLogout}>Logout</button>
     </div>

@@ -14,15 +14,17 @@ const LoginPage = () => {
     try {
       const session = await signIn(email, password);
       console.log('Sign in successful', session);
-      if (session && typeof session.AccessToken !== 'undefined') {
+      if (session && session.AccessToken && session.IdToken) {
         sessionStorage.setItem('accessToken', session.AccessToken);
-        if (sessionStorage.getItem('accessToken')) {
+        sessionStorage.setItem('idToken', session.IdToken);
+        sessionStorage.setItem('refreshToken', session.RefreshToken);
+        if (sessionStorage.getItem('accessToken') && sessionStorage.getItem('idToken')) {
           window.location.href = '/home';
         } else {
-          console.error('Session token was not set properly.');
+          console.error('Session tokens were not set properly.');
         }
       } else {
-        console.error('SignIn session or AccessToken is undefined.');
+        console.error('SignIn session or tokens are undefined.');
       }
     } catch (error) {
       alert(`Sign in failed: ${error}`);
