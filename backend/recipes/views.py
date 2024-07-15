@@ -1,8 +1,15 @@
+import os
 import uuid
+
+from botocore.client import Config
+from botocore.exceptions import NoCredentialsError, PartialCredentialsError
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
+
+from backend import settings
 from .serializers import RecipeSerializer
 import boto3
 
@@ -66,3 +73,40 @@ def recipe_detail(request, pk):
             return Response(status=status.HTTP_204_NO_CONTENT)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+# views.py
+
+@api_view(['GET'])
+@csrf_exempt
+def get_presigned_url(request):
+    s3_client = boto3.client(
+        's3',
+        aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+        aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+        config=Config(signature_version='s3v4')
+    )
+    bucket_name = 'roulettech-photo-bucket'
+    object_name = request.GET.get('file_name')
+    content_type = request.GET.get('file_type', 'application/octet-stream')
+
+    if not bucket_name:
+        return JsonResponse({'error': 'S3 bucket name is not configured'}, status=500)
+    if not object_name:
+        return JsonResponse({'error': 'File name is required'}, status=400)
+
+    try:
+        presigned_url = s3_client.generate_presigned_url(
+            'put_object',
+            Params={'Bucket': bucket_name, 'Key': object_name, 'ContentType': content_type},
+            ExpiresIn=3600
+        )
+    except (NoCredentialsError, PartialCredentialsError) as e:
+        logger.error(f'Credentials error: {e}')
+        return JsonResponse({'error': str(e)}, status=500)
+    except Exception as e:
+        logger.error(f'Error generating presigned URL: {e}')
+        return JsonResponse({'error': 'Error generating presigned URL'}, status=500)
+
+    return JsonResponse({'url': presigned_url})
+

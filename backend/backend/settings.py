@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
-
+import os
 from pathlib import Path
 import boto3
 
@@ -131,6 +131,11 @@ dynamodb = boto3.resource(
     region_name='us-west-2',
     endpoint_url='http://localhost:8000'  # DynamoDB Local endpoint
 )
+
+# AWS credentials
+AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
+S3_BUCKET_NAME = os.getenv('S3_BUCKET_NAME')
 
 # CORS settings
 CORS_ALLOWED_ORIGINS = [

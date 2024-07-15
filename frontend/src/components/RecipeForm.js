@@ -10,13 +10,41 @@ const RecipeForm = ({ posterId }) => {
 
   const handleImageUpload = async () => {
     if (!imageFile) return null;
-    return 'https://natashaskitchen.com/wp-content/uploads/2020/07/General-Tsos-Chicken-4.jpg';
+
+    try {
+      const presignedUrlResponse = await axios.get(`${process.env.REACT_APP_BASE_URL}/api/presigned-url/`, {
+        params: {
+          file_name: imageFile.name,
+          file_type: imageFile.type,  // Pass the file type to the backend
+        },
+      });
+
+      const { url } = presignedUrlResponse.data;
+
+      await axios.put(url, imageFile, {
+        headers: {
+          'Content-Type': imageFile.type,
+        },
+      });
+
+      return url.split('?')[0];
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      if (error.response) {
+        console.error('Response data:', error.response.data);
+      }
+      return null;
+    }
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
 
     const imageUrl = await handleImageUpload();
+    if (!imageUrl) {
+      console.error('Image upload failed');
+      return;
+    }
 
     const recipe = {
       name,
@@ -25,18 +53,17 @@ const RecipeForm = ({ posterId }) => {
       content,
     };
 
-    console.log('Submitting recipe:', recipe); // Log the recipe object
+    console.log('Submitting recipe:', recipe);
 
-    axios.post(`${process.env.REACT_APP_BASE_URL}/api/recipes/`, recipe)
-      .then(response => {
-        console.log('Recipe created:', response.data);
-      })
-      .catch(error => {
-        console.error('There was an error creating the recipe!', error);
-        if (error.response) {
-          console.error('Response data:', error.response.data); // Log the response data
-        }
-      });
+    try {
+      const response = await axios.post(`${process.env.REACT_APP_BASE_URL}/api/recipes/`, recipe);
+      console.log('Recipe created:', response.data);
+    } catch (error) {
+      console.error('There was an error creating the recipe!', error);
+      if (error.response) {
+        console.error('Response data:', error.response.data);
+      }
+    }
   };
 
   return (
