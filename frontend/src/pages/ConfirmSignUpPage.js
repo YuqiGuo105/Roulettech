@@ -17,7 +17,7 @@ const ConfirmSignUpPage = () => {
   return (
     <div>
       <h1>Confirm Sign Up</h1>
-      <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username" />
+      <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Email" />
       <input type="text" value={code} onChange={(e) => setCode(e.target.value)} placeholder="Confirmation Code" />
       <button onClick={handleConfirm}>Confirm</button>
     </div>

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import RecipeList from "../components/RecipeList";
+import RecipeForm from "../components/RecipeForm";
 
 function parseJwt(token) {
   if (!token) {
@@ -17,6 +19,7 @@ function parseJwt(token) {
 const HomePage = () => {
   const navigate = useNavigate();
   const [userName, setUserName] = useState('');
+  const [post, setPost] = useState(false);
 
   useEffect(() => {
     const idTokenEncoded = sessionStorage.getItem('idToken');
@@ -40,7 +43,11 @@ const HomePage = () => {
   return (
     <div>
       <h1>Hello {userName}</h1>
-      <p>See console log for Amazon Cognito user tokens.</p>
+      <button onClick={(e) => setPost(!post)}>Post</button>
+      {
+        post ? <RecipeForm posterId={userName}></RecipeForm> : <RecipeList></RecipeList>
+      }
+
       <button onClick={handleLogout}>Logout</button>
     </div>
   );
