@@ -17,14 +17,16 @@ const RecipeDetail = () => {
   }, [id]);
 
   if (!recipe) {
-    return <div>Loading</div>;
+    return <div>Loading...</div>;
   }
 
   return (
-    <div>
-      <h1>{recipe.name}</h1>
-      <img src={recipe.imageURL} alt={recipe.name} />
-      <p>{recipe.content}</p>
+    <div className="relative md:col-span-1">
+      <h1 className="text-2xl font-bold mb-4">{recipe.name}</h1>
+      <div className="relative mb-4">
+        <p className="text-justify whitespace-pre-line">{recipe.content}</p>
+        <img className="absolute top-0 left-1/2 transform -translate-x-1/2 w-6/12 h-2/5 ml-4  object-cover rounded" src={recipe.imageURL} alt={recipe.name} />
+      </div>
     </div>
   );
 };

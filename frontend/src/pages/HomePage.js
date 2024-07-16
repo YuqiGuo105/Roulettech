@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import RecipeList from "../components/RecipeList";
 import RecipeForm from "../components/RecipeForm";
+import RecipeGenerator from "./RecipeGenerator";
 
 function parseJwt(token) {
   if (!token) {
@@ -20,7 +21,6 @@ const HomePage = () => {
   const navigate = useNavigate();
   const [userName, setUserName] = useState('');
   const [post, setPost] = useState(false);
-
   useEffect(() => {
     const idTokenEncoded = sessionStorage.getItem('idToken');
     if (idTokenEncoded) {
@@ -39,16 +39,23 @@ const HomePage = () => {
     sessionStorage.clear();
     navigate('/login');
   };
+  const handleGenerate = () => {
+    navigate('/generate');
+  };
 
   return (
     <div>
-      <h1>Hello {userName}</h1>
-      <button onClick={(e) => setPost(!post)}>Post</button>
+      <h1 className={"text-3xl font-bold text-center text-white"}>Hello {userName}</h1>
+
       {
         post ? <RecipeForm posterId={userName}></RecipeForm> : <RecipeList></RecipeList>
       }
 
-      <button onClick={handleLogout}>Logout</button>
+      <button className={"w-1/4 outline outline-offset-2 outline-blue-500"} onClick={(e) => setPost(!post)}>Post
+      </button>
+      <button className={"w-1/4 outline outline-offset-2 outline-blue-500"} onClick={handleGenerate}>Generate
+      </button>
+      <button className={"w-1/4 outline outline-offset-2 outline-blue-500"} onClick={handleLogout}>Logout</button>
     </div>
   );
 };

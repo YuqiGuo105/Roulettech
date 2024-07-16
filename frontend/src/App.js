@@ -6,6 +6,7 @@ import ConfirmSignUpPage from './pages/ConfirmSignUpPage';
 import LoginPage from './pages/LoginPage';
 import './App.css'
 import RecipeDetail from "./components/RecipeDetail";
+import RecipeGenerator from "./pages/RecipeGenerator";
 
 const App = () => {
   const isAuthenticated = () => {
@@ -21,6 +22,7 @@ const App = () => {
         <Route path="/confirm" element={<ConfirmSignUpPage />} />
         <Route path="/home" element={isAuthenticated() ? <HomePage /> : <Navigate replace to="/login" />} />
         <Route path="/recipes/:id" element={<RecipeDetail />} />
+        <Route path="/generate" element={<RecipeGenerator /> }/>
       </Routes>
     </Router>
   );

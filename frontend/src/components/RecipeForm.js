@@ -12,22 +12,25 @@ const RecipeForm = ({ posterId }) => {
     if (!imageFile) return null;
 
     try {
+      // Step 1: Get the presigned URL from Django backend
       const presignedUrlResponse = await axios.get(`${process.env.REACT_APP_BASE_URL}/api/presigned-url/`, {
         params: {
           file_name: imageFile.name,
-          file_type: imageFile.type,  // Pass the file type to the backend
+          content_type: imageFile.type,  // Ensure correct parameter name
         },
       });
 
-      const { url } = presignedUrlResponse.data;
+      const { presigned_url } = presignedUrlResponse.data;
 
-      await axios.put(url, imageFile, {
+      // Step 2: Upload the image to S3 using the presigned URL
+      await axios.put(presigned_url, imageFile, {
         headers: {
           'Content-Type': imageFile.type,
         },
       });
 
-      return url.split('?')[0];
+      // Return the URL without query parameters
+      return presigned_url.split('?')[0];
     } catch (error) {
       console.error('Error uploading image:', error);
       if (error.response) {
@@ -40,6 +43,7 @@ const RecipeForm = ({ posterId }) => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
+    // Upload the image and get the URL
     const imageUrl = await handleImageUpload();
     if (!imageUrl) {
       console.error('Image upload failed');
@@ -67,20 +71,40 @@ const RecipeForm = ({ posterId }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div>
-        <label>Name:</label>
-        <input type="text" value={name} onChange={(e) => setName(e.target.value)} required />
+    <form onSubmit={handleSubmit} className="max-w-xl mx-auto p-4 bg-white shadow-md rounded-lg">
+      <div className="mb-4">
+        <label className="block text-gray-700 text-sm font-bold mb-2">Name:</label>
+        <input
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
       </div>
-      <div>
-        <label>Image:</label>
-        <input type="file" onChange={(e) => setImageFile(e.target.files[0])} required />
+      <div className="mb-4">
+        <label className="block text-gray-700 text-sm font-bold mb-2">Image:</label>
+        <input
+          type="file"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          onChange={(e) => setImageFile(e.target.files[0])}
+          required
+        />
       </div>
-      <div>
-        <label>Content:</label>
-        <ReactQuill value={content} onChange={setContent} />
+      <div className="mb-4">
+        <label className="block text-gray-700 text-sm font-bold mb-2">Content:</label>
+        <div className="h-64 pb-10">
+          <ReactQuill
+            value={content}
+            onChange={setContent}
+            className="bg-white h-full"
+            theme="snow"
+          />
+        </div>
       </div>
-      <button type="submit">Submit</button>
+      <button type="submit" className="w-11/12 bg-blue-500 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+        Submit
+      </button>
     </form>
   );
 };
