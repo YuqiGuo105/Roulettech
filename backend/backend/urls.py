@@ -20,7 +20,7 @@ from recipes.views import index
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', index, name='index'),  # Root URL pattern
-    path('api/', include('recipes.urls')),  # Include your app's URLs
+    path('', index, name='index'),
+    path('api/', include('recipes.urls')),
 ]
 

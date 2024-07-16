@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 import os
 from pathlib import Path
 import boto3
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -41,6 +42,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'recipes',
     'corsheaders',
+    'storages',
 ]
 
 MIDDLEWARE = [
@@ -133,9 +135,13 @@ dynamodb = boto3.resource(
 )
 
 # AWS credentials
-AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
-AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
-S3_BUCKET_NAME = os.getenv('S3_BUCKET_NAME')
+AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = 'roulettech-recipe-bucket'
+AWS_S3_REGION_NAME = 'us-west-2'
+
+# OpenAI credentials
+OPENAI_API_KEY = config('OPENAI_API_KEY')
 
 # CORS settings
 CORS_ALLOWED_ORIGINS = [
