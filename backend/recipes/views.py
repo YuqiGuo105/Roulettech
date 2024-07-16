@@ -1,17 +1,17 @@
 import os
 import uuid
-
-from botocore.client import Config
+import openai
+from botocore.client import Config, logger
 from botocore.exceptions import NoCredentialsError, PartialCredentialsError
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.http import HttpResponse, JsonResponse
-
 from backend import settings
 from .serializers import RecipeSerializer
 import boto3
+from django.conf import settings
 
 dynamodb = boto3.resource('dynamodb', endpoint_url='http://localhost:8000')
 table = dynamodb.Table('Recipes')
@@ -75,38 +75,59 @@ def recipe_detail(request, pk):
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-# views.py
-
 @api_view(['GET'])
 @csrf_exempt
 def get_presigned_url(request):
     s3_client = boto3.client(
         's3',
+        region_name=settings.AWS_S3_REGION_NAME,
         aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-        aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-        config=Config(signature_version='s3v4')
+        aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY
     )
-    bucket_name = 'roulettech-photo-bucket'
-    object_name = request.GET.get('file_name')
-    content_type = request.GET.get('file_type', 'application/octet-stream')
+    file_name = request.GET.get('file_name')
+    content_type = request.GET.get('content_type')
 
-    if not bucket_name:
-        return JsonResponse({'error': 'S3 bucket name is not configured'}, status=500)
-    if not object_name:
-        return JsonResponse({'error': 'File name is required'}, status=400)
+    if not file_name or not content_type:
+        return JsonResponse({'error': 'file_name and content_type are required parameters'}, status=400)
 
     try:
         presigned_url = s3_client.generate_presigned_url(
             'put_object',
-            Params={'Bucket': bucket_name, 'Key': object_name, 'ContentType': content_type},
+            Params={
+                'Bucket': settings.AWS_STORAGE_BUCKET_NAME,
+                'Key': file_name,
+                'ContentType': content_type
+            },
             ExpiresIn=3600
         )
-    except (NoCredentialsError, PartialCredentialsError) as e:
-        logger.error(f'Credentials error: {e}')
-        return JsonResponse({'error': str(e)}, status=500)
+        return JsonResponse({'presigned_url': presigned_url})
     except Exception as e:
-        logger.error(f'Error generating presigned URL: {e}')
-        return JsonResponse({'error': 'Error generating presigned URL'}, status=500)
+        return JsonResponse({'error': str(e)}, status=500)
 
-    return JsonResponse({'url': presigned_url})
 
+@api_view(['POST'])
+def generate_recipe(request):
+    data = request.data
+    prompt = data.get('prompt')
+
+    if not prompt:
+        return JsonResponse({'error': 'Prompt is required'}, status=400)
+
+    openai.api_key = settings.OPENAI_API_KEY
+
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": prompt}
+            ],
+            max_tokens=500,
+            n=1,
+            stop=None,
+            temperature=0.7,
+        )
+        recipe = response.choices[0].message['content'].strip()
+        return JsonResponse({'recipe': recipe})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
