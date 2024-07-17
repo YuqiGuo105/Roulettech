@@ -20,6 +20,7 @@ Follow these instructions to set up and run the project on your local machine fo
 ```plaintext
 REACT_APP_COGNITO_CLIENT_ID=COGNITO_ID
 REACT_APP_BASE_URL=BACKEND_URL
+REACT_APP_COGNITO_REGION=COGNITO_REGION
 ```
 
 ### Run the app
