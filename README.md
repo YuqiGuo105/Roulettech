@@ -1,7 +1,8 @@
 # Roulettech App
 
-### URL: http://roulettech-frontend-app.s3-website-us-west-2.amazonaws.com
-### Backend URL: http://ec2-35-93-146-72.us-west-2.compute.amazonaws.com:8001
+#### URL: http://roulettech-frontend-app.s3-website-us-west-2.amazonaws.com
+#### Backend URL: http://ec2-35-93-146-72.us-west-2.compute.amazonaws.com:8001
+#### Demo: https://youtu.be/DHcVVtwSVZM
 
 ## Tech Stack and Architecture Overview
 Include an overview of the technologies used in this project:

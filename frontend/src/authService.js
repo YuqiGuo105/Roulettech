@@ -1,64 +1,70 @@
-// src/services/authService.js
-const {
-  CognitoIdentityProviderClient,
-  SignUpCommand,
-  ConfirmSignUpCommand,
-  InitiateAuthCommand,
-} = require("@aws-sdk/client-cognito-identity-provider");
+import { CognitoUserPool, CognitoUser, AuthenticationDetails } from 'amazon-cognito-identity-js';
 
-const client = new CognitoIdentityProviderClient({
-  region: "us-east-2",
-});
-
-const signUp = async (username, password) => {
-  const command = new SignUpCommand({
-    ClientId: process.env.REACT_APP_COGNITO_CLIENT_ID,
-    Username: username,
-    Password: password,
-  });
-
-  try {
-    const response = await client.send(command);
-    return response;
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
+const poolData = {
+  UserPoolId: process.env.REACT_APP_COGNITO_REGION, // Your user pool id here
+  ClientId: process.env.REACT_APP_COGNITO_CLIENT_ID // Your client id here
 };
 
-const confirmSignUp = async (username, code) => {
-  const command = new ConfirmSignUpCommand({
-    ClientId: process.env.REACT_APP_COGNITO_CLIENT_ID,
-    Username: username,
-    ConfirmationCode: code,
-  });
+const userPool = new CognitoUserPool(poolData);
 
-  try {
-    const response = await client.send(command);
-    return response;
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
+export const signUp = (email, password) => {
+  return new Promise((resolve, reject) => {
+    userPool.signUp(email, password, [], null, (err, result) => {
+      if (err) {
+        console.error('Sign Up Error:', err);
+        reject(err);
+        return;
+      }
+      resolve(result);
+    });
+  });
 };
 
-const signIn = async (username, password) => {
-  const command = new InitiateAuthCommand({
-    AuthFlow: "USER_PASSWORD_AUTH",
-    ClientId: process.env.REACT_APP_COGNITO_CLIENT_ID,
-    AuthParameters: {
-      USERNAME: username,
-      PASSWORD: password,
-    },
-  });
+export const signIn = (email, password) => {
+  return new Promise((resolve, reject) => {
+    const authenticationDetails = new AuthenticationDetails({
+      Username: email,
+      Password: password,
+    });
 
-  try {
-    const response = await client.send(command);
-    return response.AuthenticationResult;
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
+    const user = new CognitoUser({
+      Username: email,
+      Pool: userPool,
+    });
+
+    user.authenticateUser(authenticationDetails, {
+      onSuccess: (result) => {
+        console.log('Authentication successful:', result);
+        const tokens = {
+          AccessToken: result.getAccessToken().getJwtToken(),
+          IdToken: result.getIdToken().getJwtToken(),
+          RefreshToken: result.getRefreshToken().getToken(),
+        };
+        console.log('Extracted tokens:', tokens);
+        resolve(tokens);
+      },
+      onFailure: (err) => {
+        console.error('Sign In Error:', err);
+        reject(err);
+      },
+    });
+  });
 };
 
-module.exports = { signUp, confirmSignUp, signIn };
+export const confirmSignUp = (username, code) => {
+  return new Promise((resolve, reject) => {
+    const user = new CognitoUser({
+      Username: username,
+      Pool: userPool,
+    });
+
+    user.confirmRegistration(code, true, (err, result) => {
+      if (err) {
+        console.error('Confirmation Error:', err);
+        reject(err);
+        return;
+      }
+      resolve(result);
+    });
+  });
+};
