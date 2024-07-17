@@ -17,7 +17,6 @@ from decouple import config
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
@@ -27,8 +26,11 @@ SECRET_KEY = 'django-insecure-lj6rfn2mr9ym9f=#-)w$x-f6pn&skg0!)z1jjgf1k_#yj%f05f
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    'ec2-35-93-146-72.us-west-2.compute.amazonaws.com',
+]
 
 # Application definition
 
@@ -104,7 +106,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
@@ -115,7 +116,6 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
@@ -131,8 +131,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 dynamodb = boto3.resource(
     'dynamodb',
     region_name='us-west-2',
-    endpoint_url='http://localhost:8000'  # DynamoDB Local endpoint
+    endpoint_url='http://dynamodb:8000'  # DynamoDB Local endpoint
 )
+DYNAMODB_ENDPOINT_URL = config('DYNAMODB_ENDPOINT_URL')
+AWS_REGION = config('AWS_REGION')
 
 # AWS credentials
 AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
