@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
 import { signUp } from '../authService';
-
 const SignUpPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
-
   const handleSignUp = async () => {
     try {
       const response = await signUp(username, password, email);
@@ -27,3 +25,4 @@ const SignUpPage = () => {
 };
 
 export default SignUpPage;
+

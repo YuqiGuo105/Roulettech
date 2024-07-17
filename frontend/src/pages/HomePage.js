@@ -51,13 +51,14 @@ const HomePage = () => {
         post ? <RecipeForm posterId={userName}></RecipeForm> : <RecipeList></RecipeList>
       }
 
-      <button className={"w-1/4 outline outline-offset-2 outline-blue-500"} onClick={(e) => setPost(!post)}>Post
+      <button className={"w-1/4 outline outline-offset-2 hover:outline-blue-500"} onClick={(e) => setPost(!post)}>Post
       </button>
-      <button className={"w-1/4 outline outline-offset-2 outline-blue-500"} onClick={handleGenerate}>Generate
+      <button className={"w-1/4 outline outline-offset-2 hover:outline-blue-500"} onClick={handleGenerate}>Generate
       </button>
-      <button className={"w-1/4 outline outline-offset-2 outline-blue-500"} onClick={handleLogout}>Logout</button>
+      <button className={"w-1/4 outline outline-offset-2 hover:outline-blue-500"} onClick={handleLogout}>Logout</button>
     </div>
   );
 };
 
 export default HomePage;
+

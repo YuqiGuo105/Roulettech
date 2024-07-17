@@ -86,7 +86,7 @@ const RecipeForm = ({ posterId }) => {
         <label className="block text-gray-700 text-sm font-bold mb-2">Image:</label>
         <input
           type="file"
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-3 py-2 border border-gray-300 text-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           onChange={(e) => setImageFile(e.target.files[0])}
           required
         />
@@ -97,7 +97,7 @@ const RecipeForm = ({ posterId }) => {
           <ReactQuill
             value={content}
             onChange={setContent}
-            className="bg-white h-full"
+            className="bg-white h-full text-gray-700"
             theme="snow"
           />
         </div>
@@ -110,3 +110,4 @@ const RecipeForm = ({ posterId }) => {
 };
 
 export default RecipeForm;
+

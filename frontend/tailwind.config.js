@@ -14,6 +14,9 @@ module.exports = {
           10: '#9B90C2',
           20: '#B28FCE'
         }
+      },
+      clear: {
+        'right': 'both',
       }
     },
   },
