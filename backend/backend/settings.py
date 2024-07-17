@@ -148,6 +148,7 @@ OPENAI_API_KEY = config('OPENAI_API_KEY')
 # CORS settings
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
+    "http://roulettech-frontend-app.s3-website-us-west-2.amazonaws.com",
 ]
 
 # Optional settings

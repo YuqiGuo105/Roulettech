@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import RecipeList from "../components/RecipeList";
 import RecipeForm from "../components/RecipeForm";
-import RecipeGenerator from "./RecipeGenerator";
 
 function parseJwt(token) {
   if (!token) {

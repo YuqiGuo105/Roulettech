@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-
+import {useNavigate} from "react-router-dom";
 const RecipeForm = ({ posterId }) => {
   const [name, setName] = useState('');
   const [content, setContent] = useState('');
   const [imageFile, setImageFile] = useState(null);
-
+  const navigate = useNavigate();
   const handleImageUpload = async () => {
     if (!imageFile) return null;
 
@@ -62,6 +62,8 @@ const RecipeForm = ({ posterId }) => {
     try {
       const response = await axios.post(`${process.env.REACT_APP_BASE_URL}/api/recipes/`, recipe);
       console.log('Recipe created:', response.data);
+      alert('Success');
+      navigate('/home');
     } catch (error) {
       console.error('There was an error creating the recipe!', error);
       if (error.response) {
